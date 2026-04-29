@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f4f7f9;
+      text-align: center;
+    }
+    h1 { color: #1e3a8a; }
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 80%;
+      margin: 20px 0;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+    }
+    button {
+      padding: 12px 30px;
+      font-size: 18px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: #2563eb; }
+    #result {
+      margin-top: 30px;
+      font-size: 22px;
+      font-weight: bold;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>💰 Tax Calculator</h1>
+  <p>Enter your annual income</p>
+  
+  <input type="number" id="income" placeholder="Enter Income (e.g. 75000)" min="0">
+  <br><br>
+  <button onclick="calculate()">Calculate Tax</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function calculate() {
+      const incomeInput = document.getElementById('income').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!incomeInput || incomeInput <= 0) {
+        resultDiv.innerHTML = `<span style="color:red;">Please enter a valid positive income</span>`;
+        return;
+      }
+
+      try {
+        const response = await fetch('/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ income: incomeInput })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          resultDiv.innerHTML = `<span style="color:red;">${data.error}</span>`;
+        } else {
+          resultDiv.innerHTML = `
+            <strong>Income:</strong> $${data.income.toLocaleString()}<br>
+            <strong>Tax Payable:</strong> <span style="color:#dc2626">$${data.tax.toLocaleString()}</span><br>
+            <strong>Total Amount:</strong> <span style="color:#16a34a">$${data.total.toLocaleString()}</span>
+          `;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<span style="color:red;">Error connecting to server</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
