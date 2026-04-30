@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: tax-calculator-run
+spec:
+  pipelineRef:
+    name: tax-calculator-pipeline
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: source-pvc
+  params:
+  - name: image
+    value: us.icr.io/radheytyagi4-jpg/tax-calculator:latest
